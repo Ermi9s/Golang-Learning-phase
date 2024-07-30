@@ -1,58 +1,39 @@
-# Library Management System
+# Library Management API
 
-This is a simple command-line based Library Management System written in Go. It allows users to sign up, log in, and manage books within the library. Users can add, remove, borrow, and return books. The application uses buffered input for user interactions.
+## `models` Package
 
-## Features
+### Types
 
-- Sign Up and Log In
-- Add books to the library
-- Remove books from the library
-- Borrow books from the library
-- Return borrowed books
-- View a list of available and borrowed books
-- Log out
+- **`Book`**
+  - `Id` (int): Unique book ID.
+  - `Title` (string): Book title.
+  - `Author` (string): Book author.
+  - `Status` (string): "Available" or "Borrowed".
 
-## Installation
+- **`Member`**
+  - `Id` (int): Member ID.
+  - `Name` (string): Member name.
+  - `BorrowedBooks` ([]Book): List of borrowed books.
 
-1. **Clone the repository:**
+## `controllers` Package
 
-    ```sh
-    git clone https://github.com/ermi9s/library-management-system.git
-    cd library-management-system
-    ```
+### Functions
 
-2. **Install dependencies:**
+- **`AddBook(library main.Library)`**
+  - Adds a book to the library.
+  - Prompts for book title and author.
 
-    ```sh
-    go mod tidy
-    ```
+- **`RemoveBook(library main.Library)`**
+  - Removes a book by its ID.
 
-## Usage
+- **`BorrowBook(library main.Library, memberID int)`**
+  - Allows a member to borrow a book.
+  - Prompts for book ID.
 
-1. **Run the application:**
+- **`ReturnBook(library main.Library, memberId int)`**
+  - Allows a member to return a borrowed book.
+  - Prompts for book ID.
 
-    ```sh
-    go run main.go
-    ```
-
-2. **Follow the prompts in the command-line interface:**
-
-    - **Sign Up:** Enter `0` to sign up as a new user.
-    - **Log In:** Enter your user ID to log in.
-    - **Exit:** Type `exit` to quit the application.
-
-3. **Menu Options:**
-    - **1. ADD BOOK:** Add a new book to the library.
-    - **2. REMOVE BOOK:** Remove a book from the library.
-    - **3. BORROW BOOK:** Borrow a book from the library.
-    - **4. RETURN BOOK:** Return a borrowed book to the library.
-    - **5. YOUR BORROW LIST:** View your borrowed books.
-    - **6. LOGOUT:** Log out and return to the main menu.
-
-## Project Structure
-
-- **controllers:** Contains the logic for adding, removing, borrowing, and returning books.
-- **models:** Contains the data models for `Book` and `Member`.
-- **services:** Contains the `Library` service which manages the book and member data.
-
+- **`UserBorrowList(library main.Library, useId int)`**
+  - Displays borrowed books of a member.
 

@@ -1,0 +1,36 @@
+# Go binary and build files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go module files
+/go.sum
+
+# Dependency directories
+/vendor/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Log files
+*.log
+
+
+# Windows specific files
+Thumbs.db
+
+
+# Go workspace
+go.work
+
+# Temporary files
+*.tmp
