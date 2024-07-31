@@ -37,15 +37,20 @@ func Main() {
 		l:= 0
 		r:= len(input)-1
 
-		for l >= r {
-			if input[l]!= input[r] {
-				fmt.Println("Not Palindrom")
+		const (
+			Reset  = "\033[0m"
+			Yellow = "\033[33m"
+			Red    = "\033[31m"
+		)
+		for l <= r {
+			if input[l] != input[r] {
+				fmt.Println(Red,"Not Palindrom",Reset)
 				return
 			}
 			l++
 			r--
 		}
-		fmt.Println("The Word is Palindrom")
+		fmt.Println(Yellow , "The Word is Palindrom" , Reset)
 		return
 	}
 
