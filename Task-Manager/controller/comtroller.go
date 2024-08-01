@@ -35,7 +35,7 @@ func GetTask(tasks *service.TaskManager) func(context *gin.Context) {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
 			return
 		}
-		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : task})
+		context.IndentedJSON(http.StatusOK , gin.H{"data" : task})
 	}
 }
 
@@ -52,7 +52,7 @@ func DeleteTask(tasks *service.TaskManager) func (contest *gin.Context) {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task doesn't exist"})
 			return
 		}
-		context.IndentedJSON(http.StatusAccepted , gin.H{"message" : "Deleted successfully"})
+		context.IndentedJSON(http.StatusOK , gin.H{"message" : "Deleted successfully"})
 	}
 }
 
@@ -74,7 +74,7 @@ func UpdateTask(tasks *service.TaskManager) func (context *gin.Context) {
 		tasks.Tasks[strconv.Itoa(id)] = &task
 		tasks.Tasks[strconv.Itoa(id)].ID = strconv.Itoa(oid)
 
-		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : *tasks.Tasks[strconv.Itoa(id)]})
+		context.IndentedJSON(http.StatusOK , gin.H{"data" : *tasks.Tasks[strconv.Itoa(id)]})
 	}
 }
 
@@ -93,7 +93,7 @@ func CreateTask(tasks *service.TaskManager) func(context *gin.Context) {
 		}
 
 		new_task := tasks.CreateTask(task)
-		context.IndentedJSON(http.StatusCreated, gin.H{"data" : new_task})
+		context.IndentedJSON(http.StatusOK, gin.H{"data" : new_task})
 		tasks.NextId++;
 	}
 }
