@@ -1,0 +1,20 @@
+
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    justify-content: center;
+    margin: 10rem;
+}
+
+.outline {
+    border: 5px , solid , rgb(16, 27, 17);
+    padding: 1rem;
+    border-radius: 1.5rem;
+    background-color: rgb(60, 90, 85);
+    width: 35%;
+}
+
+html .body {
+    background-color: rgb(41, 64, 60);
+}
