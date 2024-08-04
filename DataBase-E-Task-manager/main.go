@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/ermi9s/db-taskmanager/connection"
+	"github.com/Ermi9s/Golang-Learning-phase/DataBase-E-Task-manager/connection"
 )
 func main() {
 	remote := connection.ServerConnection{}

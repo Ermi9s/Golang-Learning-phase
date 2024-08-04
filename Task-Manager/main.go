@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/models"
-	"github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/router"
-	"github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/services"
+	"github.com/Ermi9s/Golang-Learning-phase/Task-Manager/models"
+	"github.com/Ermi9s/Golang-Learning-phase/Task-Manager/router"
+	"github.com/Ermi9s/Golang-Learning-phase/Task-Manager/services"
 )
 
 

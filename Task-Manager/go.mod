@@ -1,4 +1,4 @@
-module github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager
+module github.com/Ermi9s/Golang-Learning-phase/Task-Manager
 
 go 1.22.5
 

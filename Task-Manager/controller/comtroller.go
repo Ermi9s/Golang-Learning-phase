@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	model "github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/models"
-	service "github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/services"
+	model "github.com/Ermi9s/Golang-Learning-phase/Task-Manager/models"
+	service "github.com/Ermi9s/Golang-Learning-phase/Task-Manager/services"
 	"github.com/gin-gonic/gin"
 )
 

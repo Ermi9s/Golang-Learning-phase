@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 	"time"
-	model "github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/models"
+	model "github.com/Ermi9s/Golang-Learning-phase/Task-Manager/models"
 )
 
 type TaskManagement interface {
