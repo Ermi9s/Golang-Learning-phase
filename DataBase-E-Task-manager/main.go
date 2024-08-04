@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"github.com/ermi9s/db-taskmanager/connection"
-
 )
 func main() {
 	remote := connection.ServerConnection{}
@@ -11,6 +10,9 @@ func main() {
 	local := connection.LServerCon{}
 	local.Connect_local()
 	
-	remote.Client.Database("TaskManager").CreateCollection(context.TODO() , "NEWTEST")
-	local.Client.Database("TaskManager").CreateCollection(context.TODO() , "NEWTEST")
+	remote.Client.Database("TaskManager").Collection("NEWTEST").Drop(context.TODO())
+	local.Client.Database("TaskManager").Collection("NEWTEST").Drop(context.TODO())
+
+	
 }
+

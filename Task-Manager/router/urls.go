@@ -1,8 +1,8 @@
 package router
 
 import (
-	control "github.com/ermi9s/taskmanager/controller"
-	service "github.com/ermi9s/taskmanager/services"
+	control "github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/controller"
+	service "github.com/Ermi9s/Golang-Learning-phase/tree/main/Task-Manager/services"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
