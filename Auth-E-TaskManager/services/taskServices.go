@@ -98,15 +98,3 @@ func (DBM *DataBaseManager)DeleteTask(id primitive.ObjectID) error {
 	return err
 }
 
-
-func (DBM *DataBaseManager)GetUser(id int) (models.User , error) {
-	filter := bson.D{{Key : "_id" , Value: id}}
-	var user models.User
-
-	err := DBM.Users.FindOne(context.TODO() , filter).Decode(&user)
-	if err != nil {
-		return models.User{} ,err
-	}
-
-	return user , nil
-}
