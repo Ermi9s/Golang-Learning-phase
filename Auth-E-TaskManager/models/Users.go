@@ -6,9 +6,9 @@ import (
 )
 
 type UserClaims struct {
-	ID    string   `json:"id"`
+	jwt.StandardClaims
+	ID    primitive.ObjectID   `json:"_id"`
 	Email string `json:"email"`
-	jwt.Claims
 }
 
 type User struct {
@@ -16,5 +16,18 @@ type User struct {
 	UserName string             `json:"username" bson:"username"`
 	Email    string             `json:"email" bson:"email"`
 	Password string             `json:"password" bson:"password"`
+	Is_admin bool               `json:"is_admin" bson:"is_admin"`
+}
+
+type LogIN struct {
+	UserName string             `json:"username" bson:"username"`
+	Email    string             `json:"email" bson:"email"`
+	Password string             `json:"password" bson:"password"`
+}
+
+type LoggedInUser struct {
+	ID       primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	UserName string             `json:"username" bson:"username"`
+	Email    string             `json:"email" bson:"email"`
 	Is_admin bool               `json:"is_admin" bson:"is_admin"`
 }

@@ -17,11 +17,15 @@ func Encode( id primitive.ObjectID , email string) (string , error) {
 		log.Panic("Failed to load .env" , err.Error())
 	}
 	var SecretKey = []byte(os.Getenv("SECRETKEY"))
-
-	itoken := jwt.NewWithClaims(jwt.SigningMethodES256 , models.UserClaims{})
+	
+	log.Println(id , email)
+	itoken := jwt.NewWithClaims(jwt.SigningMethodHS256 , models.UserClaims{
+		ID: id,
+		Email: email,
+	})
 	token, err := itoken.SignedString(SecretKey)
 	if err != nil {
-		return "" , nil
+		return "" , err
 	}
 	return token , nil
 }

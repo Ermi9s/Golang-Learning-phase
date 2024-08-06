@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	models "github.com/Ermi9s/Golang-Learning-phase/Auth-E-TaskManager/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,6 +22,7 @@ type DataBaseManager struct {
 	Client *mongo.Client
 	Tasks *mongo.Collection
 	Users *mongo.Collection
+	Filter bson.D
 }
 
 var DataBase string = "TaskManager"
@@ -38,21 +40,34 @@ func (DBM *DataBaseManager)GetTask(id primitive.ObjectID) (models.Task , error) 
 	return decoded , nil
 }
 
-func (DBM *DataBaseManager)GetTasks() (models.Task , error) {
-	var decoded models.Task
+func (DBM *DataBaseManager)GetTasks() ([]models.Task , error) {
 	filter := bson.D{}
-	err := DBM.Tasks.FindOne(context.TODO() , filter).Decode(&decoded)
-
-	if err != nil {
-		return models.Task{},err
+	var decoded []models.Task
+	if DBM.Filter != nil {
+		mp := DBM.Filter.Map()
+		filter = bson.D{{Key: "creator_id" , Value: mp["_id"]}}
 	}
 
+	Curr,err := DBM.Tasks.Find(context.TODO() , filter)
+	for  Curr.Next(context.TODO()) {
+		var task models.Task
+		err := Curr.Decode(&task)
+		if err != nil {
+			return nil,nil
+		}
+		decoded = append(decoded, task)
+	}
+	if err != nil {
+		return []models.Task{},err
+	}
 	return decoded , nil
 }
 
 func (DBM *DataBaseManager)CreateTask(model models.Task) (models.Task ,error) {
 	var doc bson.M
+	model.ID = primitive.NewObjectID()
 	bsonModel,err := bson.Marshal(model)
+	
 	if err != nil {
 		return models.Task{} , err
 	}
@@ -69,6 +84,11 @@ func (DBM *DataBaseManager)CreateTask(model models.Task) (models.Task ,error) {
 }
 
 func (DBM *DataBaseManager) UpdateTask(id primitive.ObjectID, model models.Task) (models.Task, error) {
+	mp := DBM.Filter.Map()
+	if model.Creater != mp["_id"] {
+		return models.Task{},errors.New("not authorized")
+	}
+
 	bsonModel, err := bson.Marshal(model)
 	if err != nil {
 		return models.Task{}, err
@@ -83,14 +103,13 @@ func (DBM *DataBaseManager) UpdateTask(id primitive.ObjectID, model models.Task)
 	filter := bson.D{{Key: "_id", Value: id}}
 	update := bson.D{{Key: "$set", Value: doc}}
 
-	_, err = DBM.Tasks.UpdateOne(context.TODO(), filter, update)
+	_,err = DBM.Tasks.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return models.Task{}, err
 	}
 
 	return model, nil
 }
-
 
 func (DBM *DataBaseManager)DeleteTask(id primitive.ObjectID) error {
 	filter := bson.D{{Key: "_id" , Value: id}}

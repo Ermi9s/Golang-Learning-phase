@@ -99,7 +99,8 @@ func CreateTask(DBM *serv.DataBaseManager) func(context *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : err.Error()})
 			return 
 		}
-
+		value,_ := context.Get("user_id")
+		task.Creater = value.(primitive.ObjectID)
 		new_task , err := DBM.CreateTask(task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
