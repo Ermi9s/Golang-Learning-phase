@@ -5,21 +5,24 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/Ermi9s/Golang-Learning-phase/Auth-E-TaskManager/models"
 	"github.com/Ermi9s/Golang-Learning-phase/Auth-E-TaskManager/services"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
-func Validate(is_special bool , DBM *services.DataBaseManager) func(context gin.Context) {
+func Validate(is_special bool , DBM *services.DataBaseManager) func(context *gin.Context) {
 	var err error = godotenv.Load()
 	if err != nil {
 		log.Panic("Failed to load .env" , err.Error())
 	}
 
 	var SecretKey = []byte(os.Getenv("SECRETKEY"))
-	return func(context gin.Context) {
+	return func(context *gin.Context) {
 		authToken := context.GetHeader("Authorization")
 		if authToken == "" {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"Message":"Authorization Header needed"})
@@ -44,15 +47,17 @@ func Validate(is_special bool , DBM *services.DataBaseManager) func(context gin.
 		}
 
 		if is_special {
-			var id int
-			if payload , ok := token.Claims.(*UserClaims); !ok {
+			var id string
+			var objId primitive.ObjectID
+			if payload , ok := token.Claims.(*models.UserClaims); !ok {
 				context.IndentedJSON(http.StatusBadRequest , gin.H{"Message" : "Invalid Token"})
 				context.Abort()
 				return
 			}else{
 				id  = payload.ID
+				objId,_ = primitive.ObjectIDFromHex(id)
 			}
-			user ,err:= DBM.GetUser(id)
+			user ,err:= DBM.GetUser(objId)
 			if err != nil {
 				context.IndentedJSON(http.StatusBadRequest , gin.H{"Message" : "Invalid Token"})
 				context.Abort()

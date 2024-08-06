@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (DBM *DataBaseManager)GetUser(id int) (models.User , error) {
+func (DBM *DataBaseManager)GetUser(id primitive.ObjectID) (models.User , error) {
 	filter := bson.D{{Key : "_id" , Value: id}}
 	var user models.User
 
@@ -19,7 +19,7 @@ func (DBM *DataBaseManager)GetUser(id int) (models.User , error) {
 	return user , nil
 }
 
-func (DBM *DataBaseManager) GetUsers(ctx context.Context) ([]models.User, error) {
+func (DBM *DataBaseManager) GetUsers() ([]models.User, error) {
 	cursor, err := DBM.Users.Find(context.TODO(), bson.M{})
   
 	if err != nil{
@@ -88,4 +88,19 @@ func (DBM *DataBaseManager)DeleteUser(id primitive.ObjectID) error {
 	filter := bson.D{{Key:"_id" , Value: id}}
 	_,err := DBM.Users.DeleteOne(context.TODO(),  filter)
 	return err
+}
+
+func (DBM *DataBaseManager)MakeAdmin(id primitive.ObjectID)(models.User , error) {
+	var user models.User
+	filter := bson.D{{Key: "_id"  , Value: id}}
+	err := DBM.Users.FindOne(context.TODO() , filter).Decode(&user)
+	if err != nil {
+		return models.User{},err
+	}
+	user.Is_admin = true
+	promoted_user , err := DBM.UpdateUser(user.ID , user)
+	if err != nil {
+		return models.User{} , err
+	}
+	return promoted_user,nil
 }
