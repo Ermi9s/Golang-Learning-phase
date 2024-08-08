@@ -1,0 +1,185 @@
+package controller
+
+import (
+	"bytes"
+	"io"
+	"net/http"
+
+	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/Infrastructure"
+	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/domain"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+
+func GetOneUser(DBM *DataBaseManager) func(context *gin.Context) {
+	return func(context *gin.Context) {
+		id := context.Param("id")
+		new_user, err := DBM.usecase.GetUser(id)
+	
+		if err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : "User not found" , "errror" : err})
+			return 
+		}
+
+		user := new_user.(*domain.User)
+		if err != nil {
+			context.IndentedJSON(http.StatusInternalServerError , gin.H{"error" : err.Error()})
+			return
+		}
+
+		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : user})
+
+	}
+}
+
+func GetUsers(DBM *DataBaseManager) func(context *gin.Context) {
+	return func(context *gin.Context) {
+		users , err :=  DBM.usecase.GetUsers()
+		if err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return
+		}
+		context.IndentedJSON(http.StatusOK , gin.H{"data" : users})
+
+	}
+}
+
+func CreateUser(DBM *DataBaseManager) func(context *gin.Context) {
+	var user domain.User
+	return func(context *gin.Context) {
+		err := context.Request.ParseForm()
+		if err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return 
+		}
+
+		//these two are so that the context.bind can read the body multiple times 
+		// as form data can only be read once normaly.
+		byteBody,_ := io.ReadAll(context.Request.Body)
+		context.Request.Body = io.NopCloser(bytes.NewBuffer(byteBody))
+
+		if err := context.BindJSON(&user); err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return 
+		}
+		user.ID = primitive.NewObjectID()
+		inew_user,err := DBM.usecase.CreateUser(&user)
+		if err != nil {
+			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
+			return
+		}
+		new_user := inew_user.(*domain.User)
+
+		token,err :=  Infrastructure.Encode(new_user.ID , new_user.Email , user.Is_admin)
+		if err != nil {
+			context.IndentedJSON(http.StatusInternalServerError , gin.H{"token-error" : err.Error()})
+			return
+		}
+
+		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : map[string]interface{}{"token" : token,"user" : user}})
+
+	}
+}
+
+func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
+	var user domain.User
+	return func(context *gin.Context) {
+		ipayload,_ := context.Get("payload")
+		payload := ipayload.(*domain.UserClaims)
+
+		id := context.Param("id")
+		err := context.Request.ParseForm()
+		if err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return 
+		}
+		byteBody,_:= io.ReadAll(context.Request.Body)
+		context.Request.Body = io.NopCloser(bytes.NewBuffer(byteBody))
+
+		if err := context.BindJSON(&user); err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return 
+		}
+		if user.ID != payload.ID {
+			context.IndentedJSON(http.StatusNotAcceptable , gin.H{"message" : "can not update other users accounts"})
+			return
+		}
+
+		inew_user , err := DBM.usecase.UpdateUser(id , &user)
+		if err != nil {
+			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
+			return
+		}
+		new_user := inew_user.(*domain.User)
+		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : new_user})
+	}
+}
+
+func LogIN(DBM *DataBaseManager)func(context *gin.Context){
+	var loginForm domain.AuthUser
+	return func(context *gin.Context) {
+		err := context.Request.ParseForm()
+		if err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return 
+		}
+
+		byteBody,_ := io.ReadAll(context.Request.Body)
+		context.Request.Body = io.NopCloser(bytes.NewBuffer(byteBody))
+
+		if err := context.BindJSON(&loginForm); err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return 
+		}
+
+		iuser,err := DBM.usecase.LogIn(loginForm)
+		if err != nil {
+			context.IndentedJSON(http.StatusNotFound , gin.H{"error" : err.Error()})
+			return 
+		}
+		user := iuser.(*domain.User)
+		token,err :=Infrastructure.Encode(user.ID , user.Email , user.Is_admin)
+		if err != nil {
+			context.IndentedJSON(http.StatusInternalServerError , gin.H{"error" : err.Error()})
+			return
+		}
+
+		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : map[string]interface{}{"token" : token,"user" : user}})
+
+	}
+}
+
+func DeleteUser(DBM *DataBaseManager)func(context *gin.Context) {
+	return func(context *gin.Context) {
+		ipayload,_ := context.Get("payload")
+		payload := ipayload.(*domain.UserClaims)
+
+		id := context.Param("id")
+
+		if id != payload.Id && !payload.Is_admin {
+			context.IndentedJSON(http.StatusNotAcceptable , gin.H{"message" : "can not delete other users accounts"})
+			return
+		}
+
+		err := DBM.usecase.DeleteUser(id)
+		if err != nil {
+			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
+			return
+		}
+		context.IndentedJSON(http.StatusAccepted , gin.H{"message" : "deleted successfully"})
+	}
+}
+
+func PromoteUser(DBM *DataBaseManager) func(context *gin.Context) {
+	return func(context *gin.Context) {
+		id := context.Param("id")
+		user,err := DBM.usecase.Promote(id)
+		if err != nil {
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
+			return
+		}
+
+		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : user})
+	}
+}

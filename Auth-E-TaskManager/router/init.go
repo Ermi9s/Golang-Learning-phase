@@ -16,7 +16,7 @@ import (
 var Root models.User = models.User{
 	UserName: "root",
 	Email: "root@gmail.com",
-	Password: "12345678",
+	Password: "12345",
 	Is_admin: true,
 }
 

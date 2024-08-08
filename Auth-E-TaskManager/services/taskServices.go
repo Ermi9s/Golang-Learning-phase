@@ -10,12 +10,21 @@ import (
 )
 
 type DatabaseTask interface {
-	GetTask(id int) (models.Task , error)
-	CreateTask(model models.Task) error
-	GetTasks() (models.Task , error)
+	GetTask(id primitive.ObjectID) (models.Task , error)
+	GetTasks() ([]models.Task , error)
+	CreateTask(model models.Task) (models.Task ,error)
 	UpdateTask(id primitive.ObjectID, model models.Task) (models.Task, error)
 	DeleteTask(id primitive.ObjectID) error
-	GetUser(id int) (models.User , error)
+}
+
+type DataBaseUser interface {
+	GetUser(id primitive.ObjectID) (models.User , error)
+	GetUsers() ([]models.User, error)
+	CreateUser(user models.User) (models.User , error)
+	UpdateUser(id primitive.ObjectID , user models.User)(models.User , error)
+	DeleteUser(id primitive.ObjectID) error
+	MakeAdmin(id primitive.ObjectID)(models.User , error)
+	LogIn(user models.LogIN)(models.LoggedInUser , error)
 }
 
 type DataBaseManager struct {
