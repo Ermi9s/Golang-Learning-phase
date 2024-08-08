@@ -4,24 +4,23 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/infrastructure"
+
 	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/domain"
+	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/infrastructure"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
 func GetOneUser(DBM *DataBaseManager) func(context *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
-		new_user, err := DBM.Usecase.GetUser(id)
+		user, err := DBM.Usecase.GetUser(id)
 	
 		if err != nil {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : "User not found" , "errror" : err})
 			return 
 		}
 
-		user := new_user.(*domain.User)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"error" : err.Error()})
 			return
@@ -62,21 +61,20 @@ func CreateUser(DBM *DataBaseManager) func(context *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
 			return 
 		}
-		user.ID = primitive.NewObjectID()
-		inew_user,err := DBM.Usecase.CreateUser(&user)
+
+		new_user,err := DBM.Usecase.CreateUser(user)
 		if err != nil {
 			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
 			return
 		}
-		new_user := inew_user.(*domain.User)
-
-		token,err :=  infrastructure.Encode(new_user.ID , new_user.Email , user.Is_admin)
+		
+		token,err :=  infrastructure.Encode(new_user.ID , new_user.Email , false)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"token-error" : err.Error()})
 			return
 		}
 
-		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : map[string]interface{}{"token" : token,"user" : user}})
+		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : map[string]interface{}{"token" : token,"user" : new_user}})
 
 	}
 }
@@ -105,12 +103,11 @@ func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
 			return
 		}
 
-		inew_user , err := DBM.Usecase.UpdateUser(id , &user)
+		new_user , err := DBM.Usecase.UpdateUser(id , user)
 		if err != nil {
 			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
 			return
 		}
-		new_user := inew_user.(*domain.User)
 		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : new_user})
 	}
 }
@@ -132,18 +129,16 @@ func LogIN(DBM *DataBaseManager)func(context *gin.Context){
 			return 
 		}
 
-		iuser,err := DBM.Usecase.LogIn(loginForm)
+		user,err := DBM.Usecase.LogIn(loginForm)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"error" : err.Error()})
 			return 
 		}
-		user := iuser.(*domain.User)
 		token,err :=infrastructure.Encode(user.ID , user.Email , user.Is_admin)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"error" : err.Error()})
 			return
 		}
-
 		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : map[string]interface{}{"token" : token,"user" : user}})
 
 	}

@@ -4,18 +4,17 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+
 	domain "github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/domain"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func GetOneTask(DBM *DataBaseManager) func(context *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
 
-		itask,err := DBM.Usecase.GetTask(id);
-		task := itask.(*domain.Task)
-
+		task,err := DBM.Usecase.GetTask(id);
+	
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
 
@@ -55,13 +54,11 @@ func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
 func DeleteTask(DBM *DataBaseManager) func (contest *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
-		itask,err := DBM.Usecase.GetTask(id)
+		task,err := DBM.Usecase.GetTask(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task doesn't exist"})
 			return
 		}
-
-		task := itask.(*domain.Task)
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
 
@@ -97,7 +94,7 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 			return
 		}
 
-		updated_task , err := DBM.Usecase.UpdateTask(id, &task)
+		updated_task , err := DBM.Usecase.UpdateTask(id, task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return
@@ -119,9 +116,10 @@ func CreateTask(DBM *DataBaseManager) func(context *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : err.Error()})
 			return 
 		}
-		value,_ := context.Get("user_id")
-		task.Creator = value.(primitive.ObjectID)
-		new_task , err := DBM.Usecase.CreateTask(&task)
+		ipayload,_ := context.Get("payload")
+		payload := ipayload.(*domain.UserClaims)
+		task.Creator = payload.ID
+		new_task , err := DBM.Usecase.CreateTask(task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return

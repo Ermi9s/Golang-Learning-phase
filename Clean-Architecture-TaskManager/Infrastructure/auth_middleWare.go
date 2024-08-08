@@ -59,6 +59,7 @@ func Validate(is_special bool , onlyadmin bool) func(context *gin.Context) {
 			return
 		}
 
+		// log.Println(payload)
 		context.Set("payload" , payload)
 		context.Next()
 	}

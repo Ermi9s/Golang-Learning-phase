@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-
 	"os"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,7 +15,6 @@ import (
 type ServerConnection struct {
 	Client *mongo.Client
 }
-
 
 func (SC *ServerConnection)Connect_could(){
 	err := godotenv.Load()
@@ -32,12 +30,13 @@ func (SC *ServerConnection)Connect_could(){
 	client,connetion_err := mongo.Connect(context.TODO() , options)
 
 	if connetion_err != nil {
-		log.Panic("Failed to connect to server" , connetion_err.Error())
+		log.Panic("Failed to connect to server\n" , connetion_err.Error())
+		return
 	}
 
 
 	if err := client.Database("TaskManager").RunCommand(context.TODO() , bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
-		log.Panic("Ping failed" , err.Error())
+		log.Panic("Ping failed\n" , err.Error())
 	}
 
 	SC.Client = client

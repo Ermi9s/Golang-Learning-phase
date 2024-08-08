@@ -30,7 +30,7 @@ func init() {
 	}
 
 	if !rootExists {
-		_,err := DataBaseManager.Usecase.CreateUser(&root)
+		_,err := DataBaseManager.Usecase.CreateUser(root)
 		if err != nil {
 			log.Panic("Root not initialized!")
 		}
