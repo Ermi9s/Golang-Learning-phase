@@ -13,7 +13,7 @@ func GetOneTask(DBM *DataBaseManager) func(context *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
 
-		itask,err := DBM.usecase.GetTask(id);
+		itask,err := DBM.Usecase.GetTask(id);
 		task := itask.(*domain.Task)
 
 		ipayload,_ := context.Get("payload")
@@ -42,7 +42,7 @@ func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
 			filter["_id"] = payload.Id
 		}
 
-		tasks,err := DBM.usecase.GetTasks(filter);
+		tasks,err := DBM.Usecase.GetTasks(filter);
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
 			return
@@ -55,7 +55,7 @@ func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
 func DeleteTask(DBM *DataBaseManager) func (contest *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
-		itask,err := DBM.usecase.GetTask(id)
+		itask,err := DBM.Usecase.GetTask(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task doesn't exist"})
 			return
@@ -70,7 +70,7 @@ func DeleteTask(DBM *DataBaseManager) func (contest *gin.Context) {
 			return
 		}
 
-		err = DBM.usecase.DeleteTask(id)
+		err = DBM.Usecase.DeleteTask(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "error deleting task"})
 			return
@@ -97,7 +97,7 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 			return
 		}
 
-		updated_task , err := DBM.usecase.UpdateTask(id, &task)
+		updated_task , err := DBM.Usecase.UpdateTask(id, &task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return
@@ -121,7 +121,7 @@ func CreateTask(DBM *DataBaseManager) func(context *gin.Context) {
 		}
 		value,_ := context.Get("user_id")
 		task.Creator = value.(primitive.ObjectID)
-		new_task , err := DBM.usecase.CreateTask(&task)
+		new_task , err := DBM.Usecase.CreateTask(&task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return

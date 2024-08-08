@@ -6,7 +6,7 @@ import (
 
 
 func (userusecase *UseCaseData)GetUser(id string) (domain.Model, error) {
-	doc , err := userusecase.repo.GetDocumentById("Users" , id)
+	doc , err := userusecase.Repo.GetDocumentById("Users" , id)
 	if err != nil {
 		return &domain.Task{},err
 	}
@@ -15,7 +15,7 @@ func (userusecase *UseCaseData)GetUser(id string) (domain.Model, error) {
 
 func (userusecase *UseCaseData)GetUsers() ([]domain.User, error) {
 	filter := make(map[string]string)
-	decoded, err := userusecase.repo.GetDocumentByFilter("Users" , filter)
+	decoded, err := userusecase.Repo.GetDocumentByFilter("Users" , filter)
 	if err != nil {
 		return []domain.User{} , err
 	}
@@ -28,7 +28,7 @@ func (userusecase *UseCaseData)GetUsers() ([]domain.User, error) {
 }
 
 func (userusecase *UseCaseData)CreateUser(model domain.Model) (domain.Model, error) {
-	err := userusecase.repo.InsertDocument("Users" , model)
+	err := userusecase.Repo.InsertDocument("Users" , model)
 	if err != nil {
 		return &domain.User{} , err
 	}
@@ -36,7 +36,7 @@ func (userusecase *UseCaseData)CreateUser(model domain.Model) (domain.Model, err
 }
 
 func (userusecase *UseCaseData)UpdateUser(id string , model domain.Model) (domain.Model, error) {
-	err := userusecase.repo.UpdateDocumentById("Users", id , model)
+	err := userusecase.Repo.UpdateDocumentById("Users", id , model)
 	if err != nil {
 		return &domain.User{},err
 	}
@@ -44,7 +44,7 @@ func (userusecase *UseCaseData)UpdateUser(id string , model domain.Model) (domai
 }
 
 func (userusecase *UseCaseData)DeleteUser(id string) error {
-	err := userusecase.repo.DeleteDocument("Users" , id)
+	err := userusecase.Repo.DeleteDocument("Users" , id)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (userusecase *UseCaseData)LogIn(model domain.AuthUser) (domain.Model , erro
 	filter["email"] = model.Email
 	filter["password"] = model.Password
 
-	result,err := userusecase.repo.GetDocumentByFilter("Users" , filter)
+	result,err := userusecase.Repo.GetDocumentByFilter("Users" , filter)
 	user := result[0]
 	if err != nil {
 		return &domain.User{} , err

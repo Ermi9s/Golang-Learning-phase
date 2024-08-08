@@ -5,7 +5,7 @@ import (
 )
 
 func (taskusecase *UseCaseData)GetTask(id string) (domain.Model, error) {
-	doc , err := taskusecase.repo.GetDocumentById("Tasks" , id)
+	doc , err := taskusecase.Repo.GetDocumentById("Tasks" , id)
 	if err != nil {
 		return &domain.Task{},err
 	}
@@ -13,7 +13,7 @@ func (taskusecase *UseCaseData)GetTask(id string) (domain.Model, error) {
 }
 
 func (taskusecase *UseCaseData)GetTasks(filter map[string]string) ([]domain.Task, error) {
-	decoded, err := taskusecase.repo.GetDocumentByFilter("Tasks" , filter)
+	decoded, err := taskusecase.Repo.GetDocumentByFilter("Tasks" , filter)
 	if err != nil {
 		return []domain.Task{} , err
 	}
@@ -26,7 +26,7 @@ func (taskusecase *UseCaseData)GetTasks(filter map[string]string) ([]domain.Task
 }
 
 func (taskusecase *UseCaseData)CreateTask(model domain.Model) (domain.Model, error) {
-	err := taskusecase.repo.InsertDocument("Tasks" , model)
+	err := taskusecase.Repo.InsertDocument("Tasks" , model)
 	if err != nil {
 		return &domain.Task{} , err
 	}
@@ -34,7 +34,7 @@ func (taskusecase *UseCaseData)CreateTask(model domain.Model) (domain.Model, err
 }
 
 func (taskusecase *UseCaseData)UpdateTask(id string , model domain.Model) (domain.Model, error) {
-	err := taskusecase.repo.UpdateDocumentById("Tasks", id , model)
+	err := taskusecase.Repo.UpdateDocumentById("Tasks", id , model)
 	if err != nil {
 		return &domain.Task{},err
 	}
@@ -43,7 +43,7 @@ func (taskusecase *UseCaseData)UpdateTask(id string , model domain.Model) (domai
 
 func (taskusecase *UseCaseData)DeleteTask(id string ) error {
 
-	err := taskusecase.repo.DeleteDocument("Tasks" , id)
+	err := taskusecase.Repo.DeleteDocument("Tasks" , id)
 	if err != nil {
 		return err
 	}
