@@ -15,19 +15,10 @@ func init() {
 	client , rootExists,root := infrastructure.Start()
 	dataBase := client.Database("TaskManager")
 
-	var Repository repository.Repository = repository.Repository{
-		Client:   client,
-		Database: dataBase,
-	}
-
-	var UseCase usecase.UseCaseData = usecase.UseCaseData{
-		Repo:&Repository,
-	}
-
 	//initialize everything
-	DataBaseManager = controller.DataBaseManager{
-		Usecase: &UseCase,
-	}
+	Repository := repository.NewRepository(client , dataBase)
+	UseCase := usecase.NewUsecase(Repository)
+	DataBaseManager = *controller.NewDatabaseManager(UseCase)
 
 	if !rootExists {
 		_,err := DataBaseManager.Usecase.CreateUser(root)

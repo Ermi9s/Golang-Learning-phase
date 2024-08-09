@@ -1,8 +1,14 @@
 package usecase
 
-import(
-	repository "github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/Repository"
+import (
+	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/domain"
 )
 type UseCaseData struct {
-	Repo *repository.Repository
+	Repo domain.Repository_interface
+}
+
+func NewUsecase(repository domain.Repository_interface) domain.Usecase_interface {
+	return &UseCaseData{
+		Repo: repository,
+	}
 }

@@ -10,24 +10,16 @@ type Model interface {
 
 type User struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	UserName string             `json:"username" bson:"username"`
-	Email    string             `json:"email" bson:"email"`
-	Password string             `json:"password" bson:"password"`
-	Is_admin bool               `json:"is_admin" bson:"is_admin"`
+	UserName string             `json:"username,omitempty" bson:"username,omitempty"`
+	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
+	Password string             `json:"password,omitempty" bson:"password,omitempty"`
+	Is_admin bool               `json:"is_admin,omitempty" bson:"is_admin,omitempty"`
 }
 
 type AuthUser struct {
 	UserName string             `json:"username" bson:"username"`
 	Email    string             `json:"email" bson:"email"`
 	Password string             `json:"password" bson:"password"`
-}
-
-type LoggedInUser struct {
-	ID       string 			`json:"id,omitempty" bson:"_id,omitempty"`
-	UserName string             `json:"username" bson:"username"`
-	Email    string             `json:"email" bson:"email"`
-	Password string             `json:"password" bson:"password"`
-	Is_admin bool               `json:"is_admin" bson:"is_admin"`
 }
 
 type Task struct {
@@ -39,4 +31,3 @@ type Task struct {
 	DueDate     primitive.DateTime `json:"duedate" bson:"duedate"`
 	Creator     primitive.ObjectID `json:"creator_id,omitempty" bson:"creator_id,omitempty"`
 }
-
