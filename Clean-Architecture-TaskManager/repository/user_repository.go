@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
 
 func (repo *Repository)GetUserDocumentById(id string) (domain.User , error){
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -29,7 +29,7 @@ func (repo *Repository)GetUserDocumentByFilter(filter map[string]string)([]domai
 		dbfilter = append(dbfilter, bson.E{Key: key , Value: val})
 	}
 	var result []domain.User
-	collection := repo.Database.Collection("User")
+	collection := repo.Database.Collection("Users")
 	cursor, err := collection.Find(context.TODO() , filter)
 	if err != nil {
 		return nil , err
@@ -42,6 +42,9 @@ func (repo *Repository)GetUserDocumentByFilter(filter map[string]string)([]domai
 			return nil , err
 		}
 		result = append(result, object)
+	}
+	if len(result) == 0 {
+		return nil , errors.New("no user found with the filter")
 	}
 	return result , nil
 }

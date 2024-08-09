@@ -24,13 +24,20 @@ func (repo *Repository)GetTaskDocumentById(id string) (domain.Task , error){
 }
 
 func (repo *Repository)GetTaskDocumentByFilter(filter map[string]string)([]domain.Task , error){
-	dbfilter := bson.D{{}}
+	dbfilter := bson.D{}
 	for key,val := range filter {
+		if key == "creator_id" {
+			c_id,_ := primitive.ObjectIDFromHex(val)
+			dbfilter = append(dbfilter, bson.E{Key: key , Value: c_id})
+			continue
+		}
 		dbfilter = append(dbfilter, bson.E{Key: key , Value: val})
 	}
+	
+
 	var result []domain.Task
 	collection := repo.Database.Collection("Tasks")
-	cursor, err := collection.Find(context.TODO() , filter)
+	cursor, err := collection.Find(context.TODO() , dbfilter)
 	if err != nil {
 		return nil , err
 	}

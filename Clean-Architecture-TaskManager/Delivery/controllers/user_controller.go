@@ -20,12 +20,7 @@ func GetOneUser(DBM *DataBaseManager) func(context *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : "User not found" , "errror" : err})
 			return 
 		}
-
-		if err != nil {
-			context.IndentedJSON(http.StatusInternalServerError , gin.H{"error" : err.Error()})
-			return
-		}
-
+	
 		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : user})
 
 	}
@@ -98,7 +93,7 @@ func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
 			return 
 		}
-		if user.ID != payload.ID {
+		if id != payload.ID.Hex() {
 			context.IndentedJSON(http.StatusNotAcceptable , gin.H{"message" : "can not update other users accounts"})
 			return
 		}
@@ -115,6 +110,7 @@ func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
 func LogIN(DBM *DataBaseManager)func(context *gin.Context){
 	var loginForm domain.AuthUser
 	return func(context *gin.Context) {
+		
 		err := context.Request.ParseForm()
 		if err != nil {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})

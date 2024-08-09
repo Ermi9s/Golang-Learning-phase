@@ -29,7 +29,6 @@ func (taskusecase *UseCaseData)CreateTask(model domain.Task) (domain.Task, error
 	if err != nil {
 		return domain.Task{} , err
 	}
-
 	return new_task,nil
 }
 

@@ -63,14 +63,14 @@ func (userusecase *UseCaseData)LogIn(model domain.AuthUser) (domain.User , error
 	filter := make(map[string]string)
 	filter["username"] = model.UserName
 	filter["email"] = model.Email
-	filter["password"] = model.Password
 
 	result,err := userusecase.Repo.GetUserDocumentByFilter(filter)
 	if err != nil {
 		return domain.User{} , err
 	}
+
 	user := result[0]
-	err = bcrypt.CompareHashAndPassword([]byte(model.Password) , []byte(user.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password) , []byte(model.Password))
 	if err != nil {
 		return domain.User{} , err
 	}

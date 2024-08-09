@@ -18,7 +18,7 @@ func GetOneTask(DBM *DataBaseManager) func(context *gin.Context) {
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
 
-		if !payload.Is_admin && task.Creator.Hex() != id {
+		if task.Creator.Hex() != payload.ID.Hex() && !payload.Is_admin {
 			context.IndentedJSON(http.StatusMethodNotAllowed , gin.H{"message" : "task belongs to other user"})
 			return
 		}
@@ -26,21 +26,21 @@ func GetOneTask(DBM *DataBaseManager) func(context *gin.Context) {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
 			return
 		}
+
 		context.IndentedJSON(http.StatusOK , gin.H{"data" : task})
 	}
 }
 
 func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
 	return func(context *gin.Context) {
-		var filter map[string]string
-
+		filter := make(map[string]string)
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
-
-		if !payload.Is_admin {
-			filter["_id"] = payload.Id
+		filter["creator_id"] = payload.ID.Hex()
+		if payload.Is_admin {
+			delete(filter , "creator_id")
 		}
-
+		// log.Println(filter["creator_id"] , "ke",payload.ID)
 		tasks,err := DBM.Usecase.GetTasks(filter);
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
@@ -88,8 +88,13 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : err.Error()})
 			return 
 		}
+		itask,err := DBM.Usecase.GetTask(id)
+		if err != nil {
+			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
+			return
+		}
 
-		if task.Creator.Hex() != id &&  !payload.Is_admin{
+		if itask.Creator != payload.ID &&  !payload.Is_admin{
 			context.IndentedJSON(http.StatusMethodNotAllowed , gin.H{"message" : "task belongs to other user"})
 			return
 		}
@@ -99,6 +104,8 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return
 		}
+		updated_task.ID = itask.ID
+		updated_task.Creator = itask.Creator
 		context.IndentedJSON(http.StatusOK , gin.H{"data" : updated_task})
 	}
 }
