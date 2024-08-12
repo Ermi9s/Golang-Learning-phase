@@ -1,33 +1,21 @@
 package routes
 
 import (
-	"log"
-	controller "github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/Delivery/controllers"
-	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/Repository"
-	usecase "github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/UseCase"
 	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/infrastructure"
+	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/repository"
 )
 
-var DataBaseManager controller.DataBaseManager
+var Repository *repository.Repository
 
 //runs even before main
 func init() {
-	client , rootExists,root := infrastructure.Start()
+	client := infrastructure.Start()
 	dataBase := client.Database("TaskManager")
-
-	//initialize everything
-	Repository := repository.NewRepository(client , dataBase)
-	UseCase := usecase.NewUsecase(Repository)
-	DataBaseManager = *controller.NewDatabaseManager(UseCase)
-
-	if !rootExists {
-		_,err := DataBaseManager.Usecase.CreateUser(root)
-		if err != nil {
-			log.Panic("Root not initialized!")
-		}
-	}
+	
+	//initialize main repository
+	Repository = repository.NewRepository(client , dataBase)
 }
 
-func Dependancy()*controller.DataBaseManager {
-	return &DataBaseManager
+func Dependancy() *repository.Repository {
+	return Repository
 }

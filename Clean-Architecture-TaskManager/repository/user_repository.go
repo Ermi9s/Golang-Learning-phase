@@ -8,7 +8,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (repo *Repository)GetUserDocumentById(id string) (domain.User , error){
+type User_Repository struct {
+	Repository
+}
+
+func New_User_Repository(repository Repository) domain.User_Repository_interface {
+	return &User_Repository{
+		Repository: repository,
+	}
+}
+
+func (repo *User_Repository)GetUserDocumentById(id string) (domain.User , error){
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return domain.User{},err
@@ -23,7 +33,7 @@ func (repo *Repository)GetUserDocumentById(id string) (domain.User , error){
 	return decoded,doc.Err()
 }
 
-func (repo *Repository)GetUserDocumentByFilter(filter map[string]string)([]domain.User , error){
+func (repo *User_Repository)GetUserDocumentByFilter(filter map[string]string)([]domain.User , error){
 	dbfilter := bson.D{{}}
 	for key,val := range filter {
 		dbfilter = append(dbfilter, bson.E{Key: key , Value: val})
@@ -50,7 +60,7 @@ func (repo *Repository)GetUserDocumentByFilter(filter map[string]string)([]domai
 }
 
 
-func (repo *Repository)UpdateUserDocumentById(id string , update domain.User)  error {
+func (repo *User_Repository)UpdateUserDocumentById(id string , update domain.User)  error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -77,7 +87,7 @@ func (repo *Repository)UpdateUserDocumentById(id string , update domain.User)  e
 	return nil
 }
 
-func (repo *Repository)InsertUserDocument(object domain.User) (string, error) {
+func (repo *User_Repository)InsertUserDocument(object domain.User) (string, error) {
 	collection := repo.Database.Collection("Users")
 	var docModel bson.D
 	var byteModel []byte
@@ -101,7 +111,7 @@ func (repo *Repository)InsertUserDocument(object domain.User) (string, error) {
 	return sid,nil
 }
 
-func (repo *Repository)DeleteUserDocument(id string) error {
+func (repo *User_Repository)DeleteUserDocument(id string) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err

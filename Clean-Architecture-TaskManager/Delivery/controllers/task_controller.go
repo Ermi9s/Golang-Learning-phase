@@ -9,11 +9,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetOneTask(DBM *DataBaseManager) func(context *gin.Context) {
+type Task_Controller struct {
+	Task_Usecase domain.Task_Usecase_interface
+}
+
+func New_Task_Controller(taskusecase domain.Task_Usecase_interface) *Task_Controller {
+	return &Task_Controller{
+		Task_Usecase: taskusecase,
+	}
+}
+
+func (DBM *Task_Controller)GetOneTask() func(context *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
 
-		task,err := DBM.Usecase.GetTask(id);
+		task,err := DBM.Task_Usecase.GetTask(id);
 	
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
@@ -31,7 +41,7 @@ func GetOneTask(DBM *DataBaseManager) func(context *gin.Context) {
 	}
 }
 
-func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
+func (DBM *Task_Controller) GetTasks() func(context *gin.Context) {
 	return func(context *gin.Context) {
 		filter := make(map[string]string)
 		ipayload,_ := context.Get("payload")
@@ -41,7 +51,7 @@ func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
 			delete(filter , "creator_id")
 		}
 		// log.Println(filter["creator_id"] , "ke",payload.ID)
-		tasks,err := DBM.Usecase.GetTasks(filter);
+		tasks,err := DBM.Task_Usecase.GetTasks(filter);
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
 			return
@@ -51,10 +61,10 @@ func GetTasks(DBM *DataBaseManager) func(context *gin.Context) {
 }
 
 
-func DeleteTask(DBM *DataBaseManager) func (contest *gin.Context) {
+func (DBM *Task_Controller)DeleteTask() func (contest *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
-		task,err := DBM.Usecase.GetTask(id)
+		task,err := DBM.Task_Usecase.GetTask(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task doesn't exist"})
 			return
@@ -67,7 +77,7 @@ func DeleteTask(DBM *DataBaseManager) func (contest *gin.Context) {
 			return
 		}
 
-		err = DBM.Usecase.DeleteTask(id)
+		err = DBM.Task_Usecase.DeleteTask(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "error deleting task"})
 			return
@@ -77,7 +87,7 @@ func DeleteTask(DBM *DataBaseManager) func (contest *gin.Context) {
 }
 
 
-func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
+func (DBM *Task_Controller)UpdateTask() func (context *gin.Context) {
 	var task domain.Task
 	return func(context *gin.Context) {
 		id := context.Param("id")
@@ -88,7 +98,7 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : err.Error()})
 			return 
 		}
-		itask,err := DBM.Usecase.GetTask(id)
+		itask,err := DBM.Task_Usecase.GetTask(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})
 			return
@@ -99,7 +109,7 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 			return
 		}
 
-		updated_task , err := DBM.Usecase.UpdateTask(id, task)
+		updated_task , err := DBM.Task_Usecase.UpdateTask(id, task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return
@@ -111,7 +121,7 @@ func UpdateTask(DBM *DataBaseManager) func (context *gin.Context) {
 }
 
 
-func CreateTask(DBM *DataBaseManager) func(context *gin.Context) {
+func (DBM *Task_Controller)CreateTask() func(context *gin.Context) {
 	var task domain.Task
 	return func(context *gin.Context) {
 		context.Request.ParseForm()
@@ -126,7 +136,7 @@ func CreateTask(DBM *DataBaseManager) func(context *gin.Context) {
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
 		task.Creator = payload.ID
-		new_task , err := DBM.Usecase.CreateTask(task)
+		new_task , err := DBM.Task_Usecase.CreateTask(task)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return

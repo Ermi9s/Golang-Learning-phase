@@ -10,11 +10,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type User_Controller struct {
+	User_Usecase domain.User_Usecase_interface
+}
 
-func GetOneUser(DBM *DataBaseManager) func(context *gin.Context) {
+func New_User_Controller(usecase domain.User_Usecase_interface) *User_Controller {
+	return &User_Controller{
+		User_Usecase: usecase,
+	}
+}
+
+func (DBM *User_Controller)GetOneUser() func(context *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
-		user, err := DBM.Usecase.GetUser(id)
+		user, err := DBM.User_Usecase.GetUser(id)
 	
 		if err != nil {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"message" : "User not found" , "errror" : err})
@@ -26,9 +35,9 @@ func GetOneUser(DBM *DataBaseManager) func(context *gin.Context) {
 	}
 }
 
-func GetUsers(DBM *DataBaseManager) func(context *gin.Context) {
+func (DBM *User_Controller)GetUsers() func(context *gin.Context) {
 	return func(context *gin.Context) {
-		users , err :=  DBM.Usecase.GetUsers()
+		users , err :=  DBM.User_Usecase.GetUsers()
 		if err != nil {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
 			return
@@ -38,7 +47,7 @@ func GetUsers(DBM *DataBaseManager) func(context *gin.Context) {
 	}
 }
 
-func CreateUser(DBM *DataBaseManager) func(context *gin.Context) {
+func (DBM *User_Controller)CreateUser() func(context *gin.Context) {
 	var user domain.User
 	return func(context *gin.Context) {
 		err := context.Request.ParseForm()
@@ -57,7 +66,7 @@ func CreateUser(DBM *DataBaseManager) func(context *gin.Context) {
 			return 
 		}
 
-		new_user,err := DBM.Usecase.CreateUser(user)
+		new_user,err := DBM.User_Usecase.CreateUser(user)
 		if err != nil {
 			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
 			return
@@ -74,7 +83,7 @@ func CreateUser(DBM *DataBaseManager) func(context *gin.Context) {
 	}
 }
 
-func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
+func (DBM *User_Controller)UpdateUser() func(conetext *gin.Context) {
 	var user domain.User
 	return func(context *gin.Context) {
 		ipayload,_ := context.Get("payload")
@@ -98,7 +107,7 @@ func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
 			return
 		}
 
-		new_user , err := DBM.Usecase.UpdateUser(id , user)
+		new_user , err := DBM.User_Usecase.UpdateUser(id , user)
 		if err != nil {
 			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
 			return
@@ -107,7 +116,7 @@ func UpdateUser(DBM *DataBaseManager) func(conetext *gin.Context) {
 	}
 }
 
-func LogIN(DBM *DataBaseManager)func(context *gin.Context){
+func (DBM *User_Controller)LogIN() func(context *gin.Context){
 	var loginForm domain.AuthUser
 	return func(context *gin.Context) {
 		
@@ -125,7 +134,7 @@ func LogIN(DBM *DataBaseManager)func(context *gin.Context){
 			return 
 		}
 
-		user,err := DBM.Usecase.LogIn(loginForm)
+		user,err := DBM.User_Usecase.LogIn(loginForm)
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"error" : err.Error()})
 			return 
@@ -140,7 +149,7 @@ func LogIN(DBM *DataBaseManager)func(context *gin.Context){
 	}
 }
 
-func DeleteUser(DBM *DataBaseManager)func(context *gin.Context) {
+func (DBM *User_Controller)DeleteUser() func(context *gin.Context) {
 	return func(context *gin.Context) {
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
@@ -152,7 +161,7 @@ func DeleteUser(DBM *DataBaseManager)func(context *gin.Context) {
 			return
 		}
 
-		err := DBM.Usecase.DeleteUser(id)
+		err := DBM.User_Usecase.DeleteUser(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
 			return
@@ -161,10 +170,10 @@ func DeleteUser(DBM *DataBaseManager)func(context *gin.Context) {
 	}
 }
 
-func PromoteUser(DBM *DataBaseManager) func(context *gin.Context) {
+func (DBM *User_Controller)PromoteUser() func(context *gin.Context) {
 	return func(context *gin.Context) {
 		id := context.Param("id")
-		user,err := DBM.Usecase.Promote(id)
+		user,err := DBM.User_Usecase.Promote(id)
 		if err != nil {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
 			return

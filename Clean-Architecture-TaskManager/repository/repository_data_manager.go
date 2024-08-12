@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"github.com/Ermi9s.Golang-Learning-phase/Clean-Architecture-TaskManager/domain"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -10,7 +9,7 @@ type Repository struct {
 	Database *mongo.Database
 }
 
-func NewRepository(client *mongo.Client , data_base *mongo.Database) domain.Repository_interface {
+func NewRepository(client *mongo.Client , data_base *mongo.Database) *Repository {
 	return &Repository {
 		Client: client,
 		Database: data_base,

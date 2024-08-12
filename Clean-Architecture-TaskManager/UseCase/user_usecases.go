@@ -5,32 +5,41 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type User_usecase struct {
+	User_repo domain.User_Repository_interface 
+}
 
-func (userusecase *UseCaseData)GetUser(id string) (domain.User, error) {
-	doc , err := userusecase.Repo.GetUserDocumentById(id)
+func New_User_Usecase(user_repo domain.User_Repository_interface) domain.User_Usecase_interface {
+	return &User_usecase{
+		User_repo: user_repo,
+	}
+}
+
+func (userusecase *User_usecase)GetUser(id string) (domain.User, error) {
+	doc , err := userusecase.User_repo.GetUserDocumentById(id)
 	if err != nil {
 		return domain.User{},err
 	}
 	return doc, nil
 }
 
-func (userusecase *UseCaseData)GetUsers() ([]domain.User, error) {
+func (userusecase *User_usecase)GetUsers() ([]domain.User, error) {
 	filter := make(map[string]string)
-	decoded, err := userusecase.Repo.GetUserDocumentByFilter(filter)
+	decoded, err := userusecase.User_repo.GetUserDocumentByFilter(filter)
 	if err != nil {
 		return []domain.User{} , err
 	}
 	return decoded,nil
 }
 
-func (userusecase *UseCaseData)CreateUser(model domain.User) (domain.User, error) {
+func (userusecase *User_usecase)CreateUser(model domain.User) (domain.User, error) {
 	user := model
 	hasshedPasskey,err := bcrypt.GenerateFromPassword([]byte(user.Password) , bcrypt.DefaultCost);
 	if err != nil {
 		return domain.User{},err
 	}
 	user.Password = string(hasshedPasskey)
-	id,err := userusecase.Repo.InsertUserDocument(user)
+	id,err := userusecase.User_repo.InsertUserDocument(user)
 
 	if err!= nil {
 		return domain.User{} , err
@@ -43,28 +52,28 @@ func (userusecase *UseCaseData)CreateUser(model domain.User) (domain.User, error
 	return new_model,nil
 }
 
-func (userusecase *UseCaseData)UpdateUser(id string , model domain.User) (domain.User, error) {
-	err := userusecase.Repo.UpdateUserDocumentById(id , model)
+func (userusecase *User_usecase)UpdateUser(id string , model domain.User) (domain.User, error) {
+	err := userusecase.User_repo.UpdateUserDocumentById(id , model)
 	if err != nil {
 		return domain.User{},err
 	}
 	return model , nil
 }
 
-func (userusecase *UseCaseData)DeleteUser(id string) error {
-	err := userusecase.Repo.DeleteUserDocument(id)
+func (userusecase *User_usecase)DeleteUser(id string) error {
+	err := userusecase.User_repo.DeleteUserDocument(id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (userusecase *UseCaseData)LogIn(model domain.AuthUser) (domain.User , error) {
+func (userusecase *User_usecase)LogIn(model domain.AuthUser) (domain.User , error) {
 	filter := make(map[string]string)
 	filter["username"] = model.UserName
 	filter["email"] = model.Email
 
-	result,err := userusecase.Repo.GetUserDocumentByFilter(filter)
+	result,err := userusecase.User_repo.GetUserDocumentByFilter(filter)
 	if err != nil {
 		return domain.User{} , err
 	}
@@ -79,7 +88,7 @@ func (userusecase *UseCaseData)LogIn(model domain.AuthUser) (domain.User , error
 }
 
 
-func (usecase *UseCaseData)Promote(id string)(domain.User , error) {
+func (usecase *User_usecase)Promote(id string)(domain.User , error) {
 	user , err := usecase.GetUser(id)
 	if err != nil {
 		return domain.User{},err

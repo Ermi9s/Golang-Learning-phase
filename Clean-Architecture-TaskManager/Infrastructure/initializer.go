@@ -20,7 +20,7 @@ var DataBase *mongo.Database
 var User_Collection *mongo.Collection
 var client database.ServerConnection
 
-func Start() (*mongo.Client,bool , domain.User){
+func Start() *mongo.Client{
 	//make connection 
 	client.Connect_could()
 	DataBase = client.Client.Database("TaskManager")
@@ -38,7 +38,7 @@ func Start() (*mongo.Client,bool , domain.User){
 	//ensure creation by inserting a root user
 	filter := bson.D{{Key : "username" , Value: Root.UserName} , {Key : "email" , Value: Root.Email}}
 	User_Collection.Indexes().CreateOne(context.TODO(), indexModel)
-	root := User_Collection.FindOne(context.TODO() ,filter)
+	User_Collection.FindOne(context.TODO() ,filter)
 
-	return client.Client , root.Err() == nil , Root
+	return client.Client
 }
