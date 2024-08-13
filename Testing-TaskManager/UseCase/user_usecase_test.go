@@ -1,10 +1,9 @@
-package tests
+package usecase
 
 import (
 	"errors"
 	"testing"
 
-	usecase "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/UseCase"
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/infrastructure"
 	mocks "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/mocks"
@@ -23,7 +22,7 @@ type UserUsecaseSuite struct {
 
 func (suite *UserUsecaseSuite)SetupTest() {
 	repository := new(mocks.User_Repository_interface)
-	usecase := usecase.New_User_Usecase(repository)
+	usecase := New_User_Usecase(repository)
 
 	suite.repositoy = repository
 	suite.usecase = usecase
@@ -114,7 +113,6 @@ func (suite *UserUsecaseSuite)TestCreateUserPositive() {
 	suite.Nil(passerr , "Hash password has errors")
 	suite.Equal(token , s_token , "token doesnt match")
 	suite.NoError(err , "Error found in CreateUser")
-
 }
 
 func (suite *UserUsecaseSuite)TestCreateUserNegative() {

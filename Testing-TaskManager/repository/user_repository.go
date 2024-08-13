@@ -30,7 +30,7 @@ func (repo *User_Repository)GetUserDocumentById(id string) (domain.User , error)
 	
 	doc.Decode(&decoded)
 
-	return decoded,doc.Err()
+	return decoded,nil
 }
 
 func (repo *User_Repository)GetUserDocumentByFilter(filter map[string]string)([]domain.User , error){
@@ -105,7 +105,7 @@ func (repo *User_Repository)InsertUserDocument(object domain.User) (string, erro
 	if err != nil {
 		return "", err
 	}
-	id := inserted.InsertedID.(primitive.ObjectID)
+	id := inserted.(primitive.ObjectID)
 	sid := id.Hex()
 
 	return sid,nil

@@ -1,19 +1,15 @@
 package database
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
+	databasedomain "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/database/databaseDomain"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
 type ServerConnection struct {
-	Client *mongo.Client
+	Client databasedomain.Client
 }
 
 func (SC *ServerConnection)Connect_could(){
@@ -25,18 +21,11 @@ func (SC *ServerConnection)Connect_could(){
 	password := os.Getenv("PASSWORD")
 	url := fmt.Sprintf("mongodb+srv://ermias:%s@mngo101.bbjbuu3.mongodb.net/?retryWrites=true&w=majority&appName=Mngo101" , password)
 
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	options := options.Client().ApplyURI(url).SetServerAPIOptions(serverAPI)
-	client,connetion_err := mongo.Connect(context.TODO() , options)
+	client,connetion_err := databasedomain.NewClient(url)
 
 	if connetion_err != nil {
 		log.Panic("Failed to connect to server\n" , connetion_err.Error())
 		return
-	}
-
-
-	if err := client.Database("TaskManager").RunCommand(context.TODO() , bson.D{{Key: "ping", Value: 1}}).Err(); err != nil {
-		log.Panic("Ping failed\n" , err.Error())
 	}
 
 	SC.Client = client

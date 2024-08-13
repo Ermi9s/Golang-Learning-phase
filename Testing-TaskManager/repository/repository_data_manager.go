@@ -1,15 +1,15 @@
 package repository
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
+	databasedomain "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/database/databaseDomain"
 )
 
 type Repository struct {
-	Client *mongo.Client
-	Database *mongo.Database
+	Client databasedomain.Client
+	Database databasedomain.Database
 }
 
-func NewRepository(client *mongo.Client , data_base *mongo.Database) *Repository {
+func NewRepository(client databasedomain.Client, data_base databasedomain.Database) *Repository {
 	return &Repository {
 		Client: client,
 		Database: data_base,

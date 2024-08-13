@@ -1,10 +1,9 @@
-package tests
+package usecase
 
 import (
 	"errors"
 	"testing"
 
-	usecase "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/UseCase"
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
 	mocks "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/mocks"
 	"github.com/stretchr/testify/suite"
@@ -19,7 +18,7 @@ type TaskUsecaseSuite struct {
 
 func (suite *TaskUsecaseSuite)SetupTest() {
 	repository := new(mocks.Task_Repository_interface)
-	usecase := usecase.New_Task_Usecase(repository)
+	usecase := New_Task_Usecase(repository)
 
 	suite.usecase = usecase
 	suite.repository = repository

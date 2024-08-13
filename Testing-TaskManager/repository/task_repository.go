@@ -30,7 +30,7 @@ func (repo *Task_Repository)GetTaskDocumentById(id string) (domain.Task , error)
 	
 	doc.Decode(&decoded)
 
-	return decoded,doc.Err()
+	return decoded,nil
 }
 
 func (repo *Task_Repository)GetTaskDocumentByFilter(filter map[string]string)([]domain.Task , error){
@@ -109,7 +109,7 @@ func (repo *Task_Repository)InsertTaskDocument(object domain.Task) (string, erro
 	if err != nil {
 		return "", err
 	}
-	id := inserted.InsertedID.(primitive.ObjectID)
+	id := inserted.(primitive.ObjectID)
 	sid := id.Hex()
 
 	return sid,nil
