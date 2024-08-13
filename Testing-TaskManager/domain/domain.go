@@ -17,9 +17,11 @@ type User struct {
 }
 
 type AuthUser struct {
-	UserName string             `json:"username" bson:"username"`
-	Email    string             `json:"email" bson:"email"`
-	Password string             `json:"password" bson:"password"`
+	ID       string 			`bson:"_id,omitempty" json:"_id,omitempty"`
+	UserName string             `json:"username,omitempty" bson:"username,omitempty"`
+	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
+	Password string             `json:"password,omitempty" bson:"password,omitempty"`
+	Is_admin bool               `json:"is_admin,omitempty" bson:"is_admin,omitempty"`
 }
 
 type Task struct {

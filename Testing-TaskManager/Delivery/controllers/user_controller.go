@@ -14,6 +14,8 @@ type User_Controller struct {
 	User_Usecase domain.User_Usecase_interface
 }
 
+var serv infrastructure.KeyServices
+
 func New_User_Controller(usecase domain.User_Usecase_interface) *User_Controller {
 	return &User_Controller{
 		User_Usecase: usecase,
@@ -66,18 +68,12 @@ func (DBM *User_Controller)CreateUser() func(context *gin.Context) {
 			return 
 		}
 
-		new_user,err := DBM.User_Usecase.CreateUser(user)
+		new_user , token,err := DBM.User_Usecase.CreateUser(user)
 		if err != nil {
 			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
 			return
 		}
 		
-		token,err :=  infrastructure.Encode(new_user.ID , new_user.Email , false)
-		if err != nil {
-			context.IndentedJSON(http.StatusInternalServerError , gin.H{"token-error" : err.Error()})
-			return
-		}
-
 		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : map[string]interface{}{"token" : token,"user" : new_user}})
 
 	}
@@ -102,7 +98,7 @@ func (DBM *User_Controller)UpdateUser() func(conetext *gin.Context) {
 			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
 			return 
 		}
-		if id != payload.ID.Hex() {
+		if id != payload.ID {
 			context.IndentedJSON(http.StatusNotAcceptable , gin.H{"message" : "can not update other users accounts"})
 			return
 		}
@@ -139,7 +135,7 @@ func (DBM *User_Controller)LogIN() func(context *gin.Context){
 			context.IndentedJSON(http.StatusNotFound , gin.H{"error" : err.Error()})
 			return 
 		}
-		token,err :=infrastructure.Encode(user.ID , user.Email , user.Is_admin)
+		token,err := serv.Encode(user.ID.Hex() , user.Email , user.Is_admin)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"error" : err.Error()})
 			return

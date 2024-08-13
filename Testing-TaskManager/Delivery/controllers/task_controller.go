@@ -28,7 +28,7 @@ func (DBM *Task_Controller)GetOneTask() func(context *gin.Context) {
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
 
-		if task.Creator.Hex() != payload.ID.Hex() && !payload.Is_admin {
+		if task.Creator.Hex() != payload.ID && !payload.Is_admin {
 			context.IndentedJSON(http.StatusMethodNotAllowed , gin.H{"message" : "task belongs to other user"})
 			return
 		}
@@ -46,7 +46,7 @@ func (DBM *Task_Controller) GetTasks() func(context *gin.Context) {
 		filter := make(map[string]string)
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
-		filter["creator_id"] = payload.ID.Hex()
+		filter["creator_id"] = payload.ID
 		if payload.Is_admin {
 			delete(filter , "creator_id")
 		}
@@ -104,7 +104,7 @@ func (DBM *Task_Controller)UpdateTask() func (context *gin.Context) {
 			return
 		}
 
-		if itask.Creator != payload.ID &&  !payload.Is_admin{
+		if itask.Creator.Hex() != payload.ID &&  !payload.Is_admin{
 			context.IndentedJSON(http.StatusMethodNotAllowed , gin.H{"message" : "task belongs to other user"})
 			return
 		}
@@ -135,13 +135,12 @@ func (DBM *Task_Controller)CreateTask() func(context *gin.Context) {
 		}
 		ipayload,_ := context.Get("payload")
 		payload := ipayload.(*domain.UserClaims)
-		task.Creator = payload.ID
-		new_task , err := DBM.Task_Usecase.CreateTask(task)
+		new_task , err := DBM.Task_Usecase.CreateTask(task , payload.ID)
 		if err != nil {
 			context.IndentedJSON(http.StatusInternalServerError , gin.H{"message" : "Internal server error", "error" : err.Error()})
 			return
 		}
-		context.IndentedJSON(http.StatusOK, gin.H{"data" : new_task})
+		context.IndentedJSON(http.StatusOK, gin.H{"ID" : new_task})
 	}
 }
 

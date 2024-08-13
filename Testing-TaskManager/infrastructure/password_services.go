@@ -7,14 +7,15 @@ import (
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
+type KeyServices struct {}
 
-func Encode(id primitive.ObjectID , email string , is_admin bool) (string , error) {
+func (KeyServices)Encode(id string , email string , is_admin bool) (string , error) {
 	var err error = godotenv.Load()
 	if err != nil {
-		log.Panic("Failed to load .env" , err.Error())
+		log.Panic("Failed to load .env\n" , err.Error())
 	}
 	var SecretKey = []byte(os.Getenv("SECRETKEY"))
 	
@@ -28,4 +29,9 @@ func Encode(id primitive.ObjectID , email string , is_admin bool) (string , erro
 		return "" , err
 	}
 	return token , nil
+}
+
+func (KeyServices)HashPassWord(spass string) string {
+	hasshedPasskey,_ := bcrypt.GenerateFromPassword([]byte(spass) , bcrypt.DefaultCost);
+	return string(hasshedPasskey)
 }

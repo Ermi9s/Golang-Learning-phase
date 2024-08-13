@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Task_usecase struct{
@@ -30,16 +31,14 @@ func (taskusecase *Task_usecase)GetTasks(filter map[string]string) ([]domain.Tas
 	return tasks,nil
 }
 
-func (taskusecase *Task_usecase)CreateTask(model domain.Task) (domain.Task, error) {
+func (taskusecase *Task_usecase)CreateTask(model domain.Task , user_id string) (string , error) {
+	model.Creator,_= primitive.ObjectIDFromHex(user_id)
 	id , err := taskusecase.Task_repo.InsertTaskDocument(model)
 	if err != nil {
-		return domain.Task{} , err
+		return "", err
 	}
-	new_task,err := taskusecase.GetTask(id)
-	if err != nil {
-		return domain.Task{} , err
-	}
-	return new_task,nil
+
+	return id,nil
 }
 
 func (taskusecase *Task_usecase)UpdateTask(id string , model domain.Task) (domain.Task, error) {

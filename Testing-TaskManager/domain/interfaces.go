@@ -24,7 +24,7 @@ type User_Repository_interface interface {
 type Task_Usecase_interface interface {
 	GetTask(id string) (Task, error)
 	GetTasks(filter map[string]string) ([]Task, error)
-	CreateTask(model Task) (Task, error)
+	CreateTask(model Task , user_id string) (string, error)
 	UpdateTask(id string, model Task) (Task, error)
 	DeleteTask(id string) error
 }
@@ -32,7 +32,7 @@ type Task_Usecase_interface interface {
 type User_Usecase_interface interface {
 	GetUser(id string) (User, error)
 	GetUsers() ([]User, error)
-	CreateUser(model User) (User, error)
+	CreateUser(model User) (AuthUser , string, error)
 	UpdateUser(id string, model User) (User, error)
 	DeleteUser(id string) error
 	LogIn(model AuthUser) (User, error)

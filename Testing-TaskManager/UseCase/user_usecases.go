@@ -2,16 +2,19 @@ package usecase
 
 import (
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
+	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/infrastructure"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User_usecase struct {
-	User_repo domain.User_Repository_interface 
+	User_repo domain.User_Repository_interface
+	services infrastructure.Services
 }
 
 func New_User_Usecase(user_repo domain.User_Repository_interface) domain.User_Usecase_interface {
 	return &User_usecase{
 		User_repo: user_repo,
+		services: &infrastructure.KeyServices{},
 	}
 }
 
@@ -32,24 +35,27 @@ func (userusecase *User_usecase)GetUsers() ([]domain.User, error) {
 	return decoded,nil
 }
 
-func (userusecase *User_usecase)CreateUser(model domain.User) (domain.User, error) {
+func (userusecase *User_usecase)CreateUser(model domain.User) (domain.AuthUser , string, error) {
 	user := model
-	hasshedPasskey,err := bcrypt.GenerateFromPassword([]byte(user.Password) , bcrypt.DefaultCost);
-	if err != nil {
-		return domain.User{},err
-	}
-	user.Password = string(hasshedPasskey)
+	user.Password = userusecase.services.HashPassWord(model.Password)
 	id,err := userusecase.User_repo.InsertUserDocument(user)
 
 	if err!= nil {
-		return domain.User{} , err
+		return domain.AuthUser{},"" , err
 	}
-	new_model,err := userusecase.GetUser(id)
+
+	token,err :=  userusecase.services.Encode(id , user.Email , false)
 	if err != nil {
-		return domain.User{},err
+		return domain.AuthUser{},"",err
 	}
-	
-	return new_model,nil
+	new_user := domain.AuthUser{
+		ID: id,
+		UserName: user.UserName,
+		Email: user.Email,
+		Is_admin: user.Is_admin,
+		Password: user.Password,
+	}
+	return new_user,token,nil
 }
 
 func (userusecase *User_usecase)UpdateUser(id string , model domain.User) (domain.User, error) {
@@ -57,6 +63,7 @@ func (userusecase *User_usecase)UpdateUser(id string , model domain.User) (domai
 	if err != nil {
 		return domain.User{},err
 	}
+
 	return model , nil
 }
 
