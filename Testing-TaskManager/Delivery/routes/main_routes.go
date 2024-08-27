@@ -36,8 +36,10 @@ func Run() {
 
 	_repository := Dependancy()
 	//initialize repository for each route
-	_task_repository := repository.New_Task_Repository(*_repository)
-	_user_repository := repository.New_User_Repository(*_repository)
+	user_collection := _repository.Database.Collection("Users")
+	task_collection := _repository.Database.Collection("Task")
+	_task_repository := repository.New_Task_Repository(*_repository , task_collection)
+	_user_repository := repository.New_User_Repository(*_repository , user_collection)
 
 	//initialize usecase for each route
 	_task_usecase := usecase.New_Task_Usecase(_task_repository)

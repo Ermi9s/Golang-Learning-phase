@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	databasedomain "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/database/databaseDomain"
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,11 +11,13 @@ import (
 
 type Task_Repository struct {
 	Repository
+	Collection databasedomain.Collection
 }
 
-func New_Task_Repository(repository Repository) domain.Task_Repository_interface {
+func New_Task_Repository(repository Repository , collection databasedomain.Collection) domain.Task_Repository_interface {
 	return &Task_Repository{
 		Repository: repository,
+		Collection: collection,
 	}
 }
 
@@ -25,8 +28,7 @@ func (repo *Task_Repository)GetTaskDocumentById(id string) (domain.Task , error)
 	}
 	var decoded domain.Task
 	filter := bson.D{{Key : "_id" , Value: objID}}
-	collection := repo.Database.Collection("Task")
-	doc := collection.FindOne(context.TODO() , filter)
+	doc := repo.Collection.FindOne(context.TODO() , filter)
 	
 	doc.Decode(&decoded)
 
@@ -46,8 +48,8 @@ func (repo *Task_Repository)GetTaskDocumentByFilter(filter map[string]string)([]
 	
 
 	var result []domain.Task
-	collection := repo.Database.Collection("Task")
-	cursor, err := collection.Find(context.TODO() , dbfilter)
+
+	cursor, err := repo.Collection.Find(context.TODO() , dbfilter)
 	if err != nil {
 		return nil , err
 	}
@@ -81,10 +83,8 @@ func (repo *Task_Repository)UpdateTaskDocumentById(id string , update domain.Tas
 	}
 	filter := bson.D{{Key : "_id" , Value: objID}}
 	updater := bson.D{{Key: "$set" , Value: docModel}}
-
-	collection := repo.Database.Collection("Task")
 	
-	_,err = collection.UpdateOne(context.TODO() , filter , updater)
+	_,err = repo.Collection.UpdateOne(context.TODO() , filter , updater)
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,6 @@ func (repo *Task_Repository)UpdateTaskDocumentById(id string , update domain.Tas
 }
 
 func (repo *Task_Repository)InsertTaskDocument(object domain.Task) (string, error) {
-	collection := repo.Database.Collection("Task")
 	var docModel bson.D
 	var byteModel []byte
 	
@@ -104,7 +103,7 @@ func (repo *Task_Repository)InsertTaskDocument(object domain.Task) (string, erro
 	if err != nil {
 		return "", err
 	}
-	inserted,err := collection.InsertOne(context.TODO() , docModel)
+	inserted,err := repo.Collection.InsertOne(context.TODO() , docModel)
 	
 	if err != nil {
 		return "", err
@@ -122,8 +121,7 @@ func (repo *Task_Repository)DeleteTaskDocument(id string) error {
 	}
 
 	filter := bson.D{{Key : "_id" , Value: objID}}
-	collection := repo.Database.Collection("Task")
-	_,err = collection.DeleteOne(context.TODO() , filter)
+	_,err = repo.Collection.DeleteOne(context.TODO() , filter)
 	
 	return err
 }

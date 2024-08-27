@@ -105,7 +105,7 @@ func (DBM *User_Controller)UpdateUser() func(conetext *gin.Context) {
 
 		new_user , err := DBM.User_Usecase.UpdateUser(id , user)
 		if err != nil {
-			context.IndentedJSON(http.StatusOK , gin.H{"error" : err.Error()})
+			context.IndentedJSON(http.StatusBadRequest , gin.H{"error" : err.Error()})
 			return
 		}
 		context.IndentedJSON(http.StatusAccepted , gin.H{"data" : new_user})

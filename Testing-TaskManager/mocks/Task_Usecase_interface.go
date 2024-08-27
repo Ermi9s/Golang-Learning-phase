@@ -12,27 +12,27 @@ type Task_Usecase_interface struct {
 	mock.Mock
 }
 
-// CreateTask provides a mock function with given fields: model
-func (_m *Task_Usecase_interface) CreateTask(model domain.Task) (domain.Task, error) {
-	ret := _m.Called(model)
+// CreateTask provides a mock function with given fields: model, user_id
+func (_m *Task_Usecase_interface) CreateTask(model domain.Task, user_id string) (string, error) {
+	ret := _m.Called(model, user_id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateTask")
 	}
 
-	var r0 domain.Task
+	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(domain.Task) (domain.Task, error)); ok {
-		return rf(model)
+	if rf, ok := ret.Get(0).(func(domain.Task, string) (string, error)); ok {
+		return rf(model, user_id)
 	}
-	if rf, ok := ret.Get(0).(func(domain.Task) domain.Task); ok {
-		r0 = rf(model)
+	if rf, ok := ret.Get(0).(func(domain.Task, string) string); ok {
+		r0 = rf(model, user_id)
 	} else {
-		r0 = ret.Get(0).(domain.Task)
+		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(domain.Task) error); ok {
-		r1 = rf(model)
+	if rf, ok := ret.Get(1).(func(domain.Task, string) error); ok {
+		r1 = rf(model, user_id)
 	} else {
 		r1 = ret.Error(1)
 	}

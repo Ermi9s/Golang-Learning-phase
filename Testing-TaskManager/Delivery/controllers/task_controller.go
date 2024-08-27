@@ -20,6 +20,8 @@ func New_Task_Controller(taskusecase domain.Task_Usecase_interface) *Task_Contro
 }
 
 func (DBM *Task_Controller)GetOneTask() func(context *gin.Context) {
+	
+	
 	return func(context *gin.Context) {
 		id := context.Param("id")
 
@@ -50,7 +52,7 @@ func (DBM *Task_Controller) GetTasks() func(context *gin.Context) {
 		if payload.Is_admin {
 			delete(filter , "creator_id")
 		}
-		// log.Println(filter["creator_id"] , "ke",payload.ID)
+		
 		tasks,err := DBM.Task_Usecase.GetTasks(filter);
 		if err != nil {
 			context.IndentedJSON(http.StatusNotFound , gin.H{"message" : "task not found!"})

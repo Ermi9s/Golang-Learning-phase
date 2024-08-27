@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
+
+	databasedomain "github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/database/databaseDomain"
 	"github.com/Ermi9s.Golang-Learning-phase/Testing-TaskManager/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,23 +12,24 @@ import (
 
 type User_Repository struct {
 	Repository
+	Collection databasedomain.Collection
 }
 
-func New_User_Repository(repository Repository) domain.User_Repository_interface {
+func New_User_Repository(repository Repository , collection databasedomain.Collection) domain.User_Repository_interface {
 	return &User_Repository{
 		Repository: repository,
+		Collection: collection,
 	}
 }
 
 func (repo *User_Repository)GetUserDocumentById(id string) (domain.User , error){
-	objID, err := primitive.ObjectIDFromHex(id)
+	objID,err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return domain.User{},err
 	}
 	var decoded domain.User
 	filter := bson.D{{Key : "_id" , Value: objID}}
-	collection := repo.Database.Collection("Users")
-	doc := collection.FindOne(context.TODO() , filter)
+	doc := repo.Collection.FindOne(context.TODO() , filter)
 	
 	doc.Decode(&decoded)
 
@@ -39,8 +42,7 @@ func (repo *User_Repository)GetUserDocumentByFilter(filter map[string]string)([]
 		dbfilter = append(dbfilter, bson.E{Key: key , Value: val})
 	}
 	var result []domain.User
-	collection := repo.Database.Collection("Users")
-	cursor, err := collection.Find(context.TODO() , filter)
+	cursor, err := repo.Collection.Find(context.TODO() , filter)
 	if err != nil {
 		return nil , err
 	}
@@ -77,10 +79,8 @@ func (repo *User_Repository)UpdateUserDocumentById(id string , update domain.Use
 	}
 	filter := bson.D{{Key : "_id" , Value: objID}}
 	updater := bson.D{{Key: "$set" , Value: docModel}}
-
-	collection := repo.Database.Collection("Users")
 	
-	_,err = collection.UpdateOne(context.TODO() , filter , updater)
+	_,err = repo.Collection.UpdateOne(context.TODO() , filter , updater)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,6 @@ func (repo *User_Repository)UpdateUserDocumentById(id string , update domain.Use
 }
 
 func (repo *User_Repository)InsertUserDocument(object domain.User) (string, error) {
-	collection := repo.Database.Collection("Users")
 	var docModel bson.D
 	var byteModel []byte
 	
@@ -100,7 +99,7 @@ func (repo *User_Repository)InsertUserDocument(object domain.User) (string, erro
 	if err != nil {
 		return "", err
 	}
-	inserted,err := collection.InsertOne(context.TODO() , docModel)
+	inserted,err := repo.Collection.InsertOne(context.TODO() , docModel)
 	
 	if err != nil {
 		return "", err
@@ -118,8 +117,8 @@ func (repo *User_Repository)DeleteUserDocument(id string) error {
 	}
 
 	filter := bson.D{{Key : "_id" , Value: objID}}
-	collection := repo.Database.Collection("Users")
-	_,err = collection.DeleteOne(context.TODO() , filter)
+
+	_,err = repo.Collection.DeleteOne(context.TODO() , filter)
 	
 	return err
 }

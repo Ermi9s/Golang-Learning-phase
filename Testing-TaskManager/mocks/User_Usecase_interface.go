@@ -13,31 +13,38 @@ type User_Usecase_interface struct {
 }
 
 // CreateUser provides a mock function with given fields: model
-func (_m *User_Usecase_interface) CreateUser(model domain.User) (domain.User, error) {
+func (_m *User_Usecase_interface) CreateUser(model domain.User) (domain.AuthUser, string, error) {
 	ret := _m.Called(model)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateUser")
 	}
 
-	var r0 domain.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(domain.User) (domain.User, error)); ok {
+	var r0 domain.AuthUser
+	var r1 string
+	var r2 error
+	if rf, ok := ret.Get(0).(func(domain.User) (domain.AuthUser, string, error)); ok {
 		return rf(model)
 	}
-	if rf, ok := ret.Get(0).(func(domain.User) domain.User); ok {
+	if rf, ok := ret.Get(0).(func(domain.User) domain.AuthUser); ok {
 		r0 = rf(model)
 	} else {
-		r0 = ret.Get(0).(domain.User)
+		r0 = ret.Get(0).(domain.AuthUser)
 	}
 
-	if rf, ok := ret.Get(1).(func(domain.User) error); ok {
+	if rf, ok := ret.Get(1).(func(domain.User) string); ok {
 		r1 = rf(model)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(string)
 	}
 
-	return r0, r1
+	if rf, ok := ret.Get(2).(func(domain.User) error); ok {
+		r2 = rf(model)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // DeleteUser provides a mock function with given fields: id

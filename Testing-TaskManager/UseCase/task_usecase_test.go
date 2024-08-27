@@ -201,6 +201,71 @@ func (suite *TaskUsecaseSuite)TestDeleteTaskNegative() {
 	suite.Error(err , "Error not found on deleting task")
 }
 
+//negative testcases for user repository
+
+func (suite *TaskUsecaseSuite)TestGetTaskDocumentByIdNegative(){
+	id := primitive.NewObjectID()
+
+	suite.repository.On("GetTaskDocumentById" , id.Hex()).Return(domain.Task{} , errors.New("Error decoding"))
+
+	_, err := suite.usecase.GetTask(id.Hex())
+
+	suite.NotNil(err , "No error found GetUserDocumentById")
+}
+
+func (suite *TaskUsecaseSuite)TestGetTaskDocumentByFilterNegative() {
+	task := domain.Task{
+		Title:     "Test Task",
+	}
+	filter := map[string]string{
+		"title":      task.Title,
+	}
+
+	suite.repository.On("GetTaskDocumentByFilter" , filter).Return([]domain.Task{} , errors.New("Error decoding"))
+
+	_, err := suite.usecase.GetTasks(filter)
+
+	suite.NotNil(err , "No error found GetUserDocumentById")
+}
+
+func (suite *TaskUsecaseSuite)TestInsertTaskDocumentNegative() {
+	task := domain.Task{
+		ID:        primitive.NewObjectID(),
+		Title:     "Test Task",
+		Description:   "This is a test task",
+	}
+
+	suite.repository.On("InsertTaskDocument" , task).Return("" , errors.New("Error decoding"))
+
+	_, err := suite.usecase.CreateTask(task , "2")
+
+	suite.NotNil(err , "No error found GetUserDocumentById")
+}
+
+func (suite *TaskUsecaseSuite)TestUpdateTaskDocumentByIdNegative() {
+	task := domain.Task{
+		ID:        primitive.NewObjectID(),
+		Title:     "Test Task",
+		Description:   "This is a test task",
+	}
+
+	suite.repository.On("UpdateTaskDocumentById" , task.ID.Hex() , task).Return(errors.New("Error decoding"))
+
+	_, err := suite.usecase.UpdateTask(task.ID.Hex() , task)
+
+	suite.NotNil(err , "No error found GetUserDocumentById")
+}
+
+func (suite *TaskUsecaseSuite)TestDeleteTaskDocumentNegative() {
+	id := primitive.NewObjectID().Hex()
+
+	suite.repository.On("DeleteTaskDocument" , id).Return(errors.New("Error decoding"))
+
+	err := suite.usecase.DeleteTask(id)
+
+	suite.NotNil(err , "No error found GetUserDocumentById")
+}
+
 func TestTaskUsecase(t *testing.T) {
 	suite.Run(t , new(TaskUsecaseSuite))
 }
